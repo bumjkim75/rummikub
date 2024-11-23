@@ -29,5 +29,3 @@ class Tile:
     def to_print(self, debug=False)->str:
         if not debug:
             return '{}{:>3}{}'.format(tile_color[self.color], self.number, Fore.RESET)
-
-
