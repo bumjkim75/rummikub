@@ -2,14 +2,11 @@ from src.tile import Tile
 
 
 class Board:
-    opened : dict[int, Tile] = {}
+    opened: list[Tile] = []
 
-    def hasTile(self, tile: Tile) -> bool:
-        key = self._get_key(tile)
-        return key in self.opened
-
-    def _get_key(self, tile: Tile) -> int:
-        return tile.color.value * 100 + tile.number
+    def clear(self):
+        self.opened = []
 
     def addTile(self, tile: Tile):
-        self.opened[self._get_key(tile)] = tile
+        self.opened.append(tile)
+        tile.must = True

@@ -44,8 +44,12 @@ class Solver:
     def _fill_tiles(self, tiles: list[Tile], must: bool):
         offset = 0
         for tile in tiles:
-            if self._get_a_tile(tile.color.value, tile.number) is not None:
-                offset = TILE_COLOR_MAX
+            for depth in range(TILE_BULK_MAX):
+                if self._get_a_tile(tile.color.value + offset, tile.number) is not None:
+                    offset += TILE_COLOR_MAX
+                    break
+            if offset >= TILE_COLOR_MAX * TILE_BULK_MAX:
+                raise ValueError(f"There are {tile.to_print()} tile more than {TILE_BULK_MAX}")
             tile.used = False
             tile.must = must
             self._set_a_tile(tile.color.value + offset, tile.number, tile)
@@ -73,8 +77,8 @@ class Solver:
 
     def find_optimal_solution(self):
         self._clear_tiles()
-        self._fill_tiles([t for t in self._board.opened.values()], True)
-        self._fill_tiles([t for t in self._player.tiles.values()], False)
+        self._fill_tiles([t for t in self._board.opened], True)
+        self._fill_tiles([t for t in self._player.tiles], False)
         self._search_optimal(0, 1, [])
 
     def print_solution(self):
@@ -88,6 +92,8 @@ class Solver:
                 for tile in group:
                     if tile is not None:
                         print(tile.to_print(), end='')
+                        if not tile.must:
+                            print('*', end='')
                 print(' ] ', end='')
             print ('')
 
@@ -119,12 +125,14 @@ class Solver:
         tile = self._get_a_tile(color, number)
         sets: list[Tile | None] = [None] * 4
         self._add_dict(sets, tile)
-        for col2 in range(color + 1, TILE_COLOR_MAX * TILE_BULK_MAX):
+        col2max = min(color+3, TILE_COLOR_MAX * TILE_BULK_MAX)
+        for col2 in range(color + 1, col2max):
             tile2 = self._get_a_tile(col2, number)
             if not self._add_dict(sets, tile2):
                 continue
 
-            for col3 in range(col2 + 1, TILE_COLOR_MAX * TILE_BULK_MAX):
+            col3max = min(TILE_COLOR_MAX + color, TILE_COLOR_MAX * TILE_BULK_MAX)
+            for col3 in range(col2 + 1, col3max):
                 tile3 = self._get_a_tile(col3, number)
                 if not self._add_dict(sets, tile3):
                     continue
@@ -132,7 +140,8 @@ class Solver:
                 self._search_optimal(color, number + 1, solution)
                 solution.remove(sets)
 
-                for col4 in range(col3 + 1, TILE_COLOR_MAX * TILE_BULK_MAX):
+                col4max = min(TILE_COLOR_MAX + color, TILE_COLOR_MAX * TILE_BULK_MAX)
+                for col4 in range(col3 + 1, col4max):
                     tile4 = self._get_a_tile(col4, number)
                     if not self._add_dict(sets, tile4):
                         continue
