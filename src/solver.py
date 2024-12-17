@@ -42,8 +42,8 @@ class Solver:
         return [-1, -1]
 
     def _fill_tiles(self, tiles: list[Tile], must: bool):
-        offset = 0
         for tile in tiles:
+            offset = 0
             for depth in range(TILE_BULK_MAX):
                 if self._get_a_tile(tile.color.value + offset, tile.number) is not None:
                     offset += TILE_COLOR_MAX
@@ -56,7 +56,8 @@ class Solver:
 
     def _mark_unused(self, tiles: list[Tile]):
         for tile in tiles:
-            tile.used = False
+            if tile is not None:
+                tile.used = False
 
     def _register_solution(self, solution: list):
         if len(solution) > 0:
@@ -125,34 +126,67 @@ class Solver:
         tile = self._get_a_tile(color, number)
         sets: list[Tile | None] = [None] * 4
         self._add_dict(sets, tile)
-        col2max = min(color+3, TILE_COLOR_MAX * TILE_BULK_MAX)
-        for col2 in range(color + 1, col2max):
-            tile2 = self._get_a_tile(col2, number)
-            if not self._add_dict(sets, tile2):
+        count = 1
+        for col in reversed(range(color + 1, TILE_COLOR_MAX * TILE_BULK_MAX)):
+            candidate_tile = self._get_a_tile(col, number)
+            if not self._add_dict(sets, candidate_tile):
                 continue
+            count = sum(tile is not None for tile in sets)
+            if count >= 4:
+                break
+        if count < 3:
+            self._mark_unused(sets)
+            return
+        if count == 3:
+            solution.append(sets)
+            self._search_optimal(color, number + 1, solution)
+            solution.remove(sets)
+            self._mark_unused(sets)
+            return
+        for try_possible in range(4):
+            save_tile = None
+            if try_possible != color:
+                save_tile = sets[try_possible]
+                self.unset_tile(sets, save_tile)
+            solution.append(sets)
+            self._search_optimal(color, number + 1, solution)
+            solution.remove(sets)
+            if save_tile is not None:
+                self._add_dict(sets, save_tile)
+        self._mark_unused(sets)
 
-            col3max = min(TILE_COLOR_MAX + color, TILE_COLOR_MAX * TILE_BULK_MAX)
-            for col3 in range(col2 + 1, col3max):
-                tile3 = self._get_a_tile(col3, number)
-                if not self._add_dict(sets, tile3):
-                    continue
-                solution.append(sets)
-                self._search_optimal(color, number + 1, solution)
-                solution.remove(sets)
-
-                col4max = min(TILE_COLOR_MAX + color, TILE_COLOR_MAX * TILE_BULK_MAX)
-                for col4 in range(col3 + 1, col4max):
-                    tile4 = self._get_a_tile(col4, number)
-                    if not self._add_dict(sets, tile4):
-                        continue
-                    solution.append(sets)
-                    self._search_optimal(color, number + 1, solution)
-                    solution.remove(sets)
-                    self.unset_tile(sets, tile4)
-                    break
-                self.unset_tile(sets, tile3)
-            self.unset_tile(sets, tile2)
-        self.unset_tile(sets, tile)
+        #
+        #
+        #
+        #
+        # col2max = min(color+3, TILE_COLOR_MAX * TILE_BULK_MAX)
+        # for col2 in range(color + 1, col2max):
+        #     tile2 = self._get_a_tile(col2, number)
+        #     if not self._add_dict(sets, tile2):
+        #         continue
+        #
+        #     col3max = min(TILE_COLOR_MAX + color, TILE_COLOR_MAX * TILE_BULK_MAX)
+        #     for col3 in range(col2 + 1, col3max):
+        #         tile3 = self._get_a_tile(col3, number)
+        #         if not self._add_dict(sets, tile3):
+        #             continue
+        #         solution.append(sets)
+        #         self._search_optimal(color, number + 1, solution)
+        #         solution.remove(sets)
+        #
+        #         col4max = min(TILE_COLOR_MAX + color, TILE_COLOR_MAX * TILE_BULK_MAX)
+        #         for col4 in range(col3 + 1, col4max):
+        #             tile4 = self._get_a_tile(col4, number)
+        #             if not self._add_dict(sets, tile4):
+        #                 continue
+        #             solution.append(sets)
+        #             self._search_optimal(color, number + 1, solution)
+        #             solution.remove(sets)
+        #             self.unset_tile(sets, tile4)
+        #             break
+        #         self.unset_tile(sets, tile3)
+        #     self.unset_tile(sets, tile2)
+        # self.unset_tile(sets, tile)
 
     def _try_numbers(self, color: int, number: int, solution: list):
         sets: list[Tile | None] = []

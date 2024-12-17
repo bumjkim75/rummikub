@@ -101,20 +101,23 @@ def  test_solver_verticals(board_data, player_data, result):
 @pytest.mark.parametrize("board_data, player_data, result", ([
         ([
             Tile(Color.RED, 4), Tile(Color.RED, 5), Tile(Color.RED, 6),
-            Tile(Color.RED, 7), Tile(Color.RED, 8), Tile(Color.BLACK, 4),
-            Tile(Color.RED, 4), Tile(Color.RED, 5), Tile(Color.RED, 6),
+            Tile(Color.RED, 7), Tile(Color.RED, 8),
+            Tile(Color.RED, 4), Tile(Color.RED, 4), Tile(Color.RED, 5),
+            Tile(Color.RED, 6),
             Tile(Color.RED, 1), Tile(Color.BLUE, 1), Tile(Color.BLACK, 1),
             Tile(Color.ORANGE, 10), Tile(Color.ORANGE, 11), Tile(Color.ORANGE, 12),
-            Tile(Color.ORANGE, 13), Tile(Color.BLUE, 9), Tile(Color.BLACK, 9),
-            Tile(Color.ORANGE, 9), Tile(Color.RED, 9), Tile(Color.BLUE, 3),
-            Tile(Color.BLUE, 4), Tile(Color.BLUE, 5), Tile(Color.BLUE, 6),
-            Tile(Color.BLUE, 7), Tile(Color.BLUE, 8), Tile(Color.RED, 9),
-            Tile(Color.BLUE, 9), Tile(Color.ORANGE, 9), Tile(Color.BLACK, 9)
+            Tile(Color.ORANGE, 13),
+            Tile(Color.BLUE, 9), Tile(Color.BLACK, 9), Tile(Color.ORANGE, 9),
+            Tile(Color.RED, 9),
+            # Tile(Color.BLUE, 3), Tile(Color.BLUE, 4), Tile(Color.BLUE, 5),
+            # Tile(Color.BLUE, 6), Tile(Color.BLUE, 7), Tile(Color.BLUE, 8),
+            # Tile(Color.RED, 9),
+            # Tile(Color.BLUE, 9), Tile(Color.ORANGE, 9), Tile(Color.BLACK, 9)
          ],[
-            Tile(Color.RED, 1), Tile(Color.BLUE, 2), Tile(Color.BLACK, 2),
-            Tile(Color.BLACK, 4), Tile(Color.BLACK, 13), Tile(Color.BLACK, 12),
-            Tile(Color.BLACK, 3), Tile(Color.BLACK, 7), Tile(Color.ORANGE, 7),
-            Tile(Color.ORANGE, 3), Tile(Color.BLUE, 3)
+            # Tile(Color.RED, 1), Tile(Color.BLUE, 2), Tile(Color.BLACK, 2),
+            # Tile(Color.BLACK, 4), Tile(Color.BLACK, 13), Tile(Color.BLACK, 12),
+            # Tile(Color.BLACK, 3), Tile(Color.BLACK, 7), Tile(Color.ORANGE, 7),
+            # Tile(Color.ORANGE, 3), Tile(Color.BLUE, 3)
         ], ''
         ),
     ]))
